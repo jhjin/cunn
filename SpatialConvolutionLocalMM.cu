@@ -163,11 +163,19 @@ static int cunn_SpatialConvolutionLocalMM_updateGradInput(lua_State *L) {
   int dH = luaT_getfieldcheckint(L, 1, "dH");
   int kW = luaT_getfieldcheckint(L, 1, "kW");
   int kH = luaT_getfieldcheckint(L, 1, "kH");
+  int kC = luaT_getfieldcheckint(L, 1, "kC");
   int nInputPlane = luaT_getfieldcheckint(L, 1, "nInputPlane");
   int nOutputPlane = luaT_getfieldcheckint(L, 1, "nOutputPlane");
   int padding = luaT_getfieldcheckint(L, 1, "padding");
+  int cec = luaT_getfieldcheckboolean(L, 1, "cec");
 
-  THCudaTensor *weight = (THCudaTensor *)luaT_getfieldcheckudata(L, 1, "weight", "torch.CudaTensor");
+  THCudaTensor *w_indicator = (THCudaTensor*)luaT_getfieldcheckudata(L, 1, "w_indicator", "torch.CudaTensor");
+  THCudaTensor *weight = NULL;
+  if (cec == 1) {
+    weight = (THCudaTensor *)luaT_getfieldcheckudata(L, 1, "cecWeight", "torch.CudaTensor");
+  } else {
+    weight = (THCudaTensor *)luaT_getfieldcheckudata(L, 1, "weight", "torch.CudaTensor");
+  }
   THCudaTensor *gradColumns = (THCudaTensor*)luaT_getfieldcheckudata(L, 1, "finput", "torch.CudaTensor");
   THCudaTensor *gradInput = (THCudaTensor *)luaT_getfieldcheckudata(L, 1, "gradInput", "torch.CudaTensor");
 
@@ -199,6 +207,10 @@ static int cunn_SpatialConvolutionLocalMM_updateGradInput(lua_State *L) {
   THCudaTensor *input_n = THCudaTensor_new();
   THCudaTensor *gradInput_n = THCudaTensor_new();
   THCudaTensor *gradOutput_n = THCudaTensor_new();
+
+  // zero cross-layer weights
+  zero_off_diagonal_gradients(THCudaTensor_data(weight), THCudaTensor_data(w_indicator),
+                              nInputPlane, nOutputPlane, kC, kH, kW);
 
   // For each elt in batch, do:
   for (int elt = 0; elt < batchSize; elt ++) {
