@@ -20,6 +20,7 @@
 #include "SpatialConvolutionMM_BHWD.cu"
 #include "SpatialConvolutionCUDA.cu"
 #include "SpatialConvolutionLocalMM.cu"
+#include "SpatialFlattenedConvolution.cu"
 #include "SpatialSubSampling.cu"
 #include "SpatialMaxPooling.cu"
 #include "SpatialMaxPoolingCUDA.cu"
@@ -55,6 +56,7 @@ int luaopen_libcunn(lua_State *L)
   cunn_SpatialConvolutionMM_init(L);
   cunn_SpatialConvolutionMM_BHWD_init(L);
   cunn_SpatialConvolutionLocalMM_init(L);
+  cunn_SpatialFlattenedConvolution_init(L);
   cunn_SpatialMaxPooling_init(L);
   cunn_SpatialMaxPoolingCUDA_init(L);
   cunn_SpatialSubSampling_init(L);
