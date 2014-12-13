@@ -80,7 +80,7 @@ static int cunn_SpatialFlattenedConvolution_updateOutput(lua_State *L) {
 
   // Resize output
   THCudaTensor_resize4d(intm1, batchSize, nOutputPlane, inputHeight, inputWidth);
-  THCudaTensor_resize4d(intm2, batchSize, nOutputPlane, outputHeight, outputWidth);
+  THCudaTensor_resize4d(intm2, batchSize, nOutputPlane, outputHeight, inputWidth);
   THCudaTensor_resize4d(output, batchSize, nOutputPlane, outputHeight, outputWidth);
 
   // Define a buffer of ones, for bias accumulation
@@ -160,7 +160,7 @@ static int cunn_SpatialFlattenedConvolution_updateOutput(lua_State *L) {
                                                                         THCudaTensor_data(output_n),
                                                                         THCudaTensor_data(intm2_n),
                                                                         THCudaTensor_data(weight_h),
-                                                                        inputHeight, inputWidth, kW);
+                                                                        outputHeight, inputWidth, kW);
   }
 
   // Free
